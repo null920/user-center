@@ -1,0 +1,46 @@
+spring:
+  application:
+    name: userCenter-backend
+  datasource:
+    url: jdbc:mysql://localhost:3306/userCenter
+    username: root
+    password: "000000"
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    Hikari:
+      # 连接池中允许的最小连接数。缺省值：10
+      minimum-idle: 10
+      # 连接池中允许的最大连接数。缺省值：10
+      maximum-pool-size: 100
+      # 自动提交
+      auto-commit: true
+      # 一个连接idle状态的最大时长（毫秒），超时则被释放（retired），缺省:10分钟
+      idle-timeout: 600000
+      # 连接池名字
+      pool-name: HikariCP
+      # 一个连接的生命时长（毫秒），超时而且没被使用则被释放（retired），缺省:30分钟，建议设置比数据库超时时长少30秒
+      max-lifetime: 1800000
+      # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒
+      connection-timeout: 30000
+  session:
+    # session过期时间为1天
+    timeout: 86400
+
+server:
+  port: 8080
+  servlet:
+    context-path: /api
+    session:
+      timeout: 1440m
+
+mybatis-plus:
+  configuration:
+    # 关闭自动驼峰命名规则映射
+    map-underscore-to-camel-case: false
+  global-config:
+    db-config:
+      # 逻辑删除
+      logic-delete-field: deleted
+      logic-delete-value: 1
+      logic-not-delete-value: 0
+
+
