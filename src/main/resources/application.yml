@@ -33,9 +33,6 @@ server:
       timeout: 1440m
 
 mybatis-plus:
-  configuration:
-    # 关闭自动驼峰命名规则映射
-    map-underscore-to-camel-case: false
   global-config:
     db-config:
       # 逻辑删除
