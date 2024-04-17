@@ -2,6 +2,8 @@ package com.ycr.usercenter.service.impl;
 
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
+import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import com.ycr.usercenter.common.ErrorCode;
 import com.ycr.usercenter.exception.BusinessException;
 import com.ycr.usercenter.mapper.UserMapper;
@@ -10,10 +12,17 @@ import com.ycr.usercenter.service.UserService;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.util.DigestUtils;
 
 import javax.annotation.Resource;
 import javax.servlet.http.HttpServletRequest;
+
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static com.ycr.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
@@ -127,9 +136,48 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		return 1;
 	}
 
+	@Override
+	public List<User> searchUsersByTags(List<String> tagNameList) {
+		if (CollectionUtils.isEmpty(tagNameList)) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		QueryWrapper<User> wrapper = new QueryWrapper<>();
+		List<User> userList = userMapper.selectList(wrapper);
+		Gson gson = new Gson();
+		return userList.stream().filter(user -> {
+			String tagStr = user.getTags();
+			Set<String> tagNameSet = gson.fromJson(tagStr, new TypeToken<Set<String>>() {
+			}.getType());
+			tagNameSet = Optional.ofNullable(tagNameSet).orElse(new HashSet<>());
+			for (String tagName : tagNameList) {
+				if (!tagNameSet.contains(tagName)) {
+					return false;
+				}
+			}
+			return true;
+		}).map(this::getSafetyUser).collect(Collectors.toList());
+	}
+
+
+	@Deprecated
+	public List<User> searchUsersByTagsBySQL(List<String> tagNameList) {
+		if (CollectionUtils.isEmpty(tagNameList)) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		QueryWrapper<User> wrapper = new QueryWrapper<>();
+		for (String tagName : tagNameList) {
+			wrapper = wrapper.like("tags", tagName);
+		}
+		List<User> userList = userMapper.selectList(wrapper);
+		return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
+	}
+
 
 	@Override
 	public User getSafetyUser(User originUser) {
+		if (originUser == null) {
+			return null;
+		}
 		User safetyUser = new User();
 		safetyUser.setId(originUser.getId());
 		safetyUser.setUsername(originUser.getUsername());
@@ -141,6 +189,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		safetyUser.setUserStatus(originUser.getUserStatus());
 		safetyUser.setCreateTime(originUser.getCreateTime());
 		safetyUser.setUserRole(originUser.getUserRole());
+		safetyUser.setTags(originUser.getTags());
 		return safetyUser;
 	}
 

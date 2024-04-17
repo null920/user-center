@@ -6,8 +6,8 @@ import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
 
 import javax.annotation.Resource;
-
-import static org.junit.jupiter.api.Assertions.assertTrue;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * 用户服务测试
@@ -19,7 +19,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @SpringBootTest
 class UserServiceTest {
 	@Resource
-	UserService userService;
+	private UserService userService;
 
 	/**
 	 * 用户注册测试
@@ -70,5 +70,13 @@ class UserServiceTest {
 		userAccount = "test";
 		result = userService.userRegister(userAccount, userPassword, checkPassword);
 		Assertions.assertTrue(result > 0);
+	}
+
+	@Test
+	void testSearchUsersByTags() {
+		List<String> tagNameList = Arrays.asList("Java", "Python");
+		List<User> userList = userService.searchUsersByTags(tagNameList);
+		Assertions.assertNotNull(userList);
+		//System.out.println(userList);
 	}
 }
