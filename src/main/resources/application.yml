@@ -1,11 +1,8 @@
 spring:
+  profiles:
+    active: dev
   application:
     name: user-center-backend
-  datasource:
-    url: jdbc:mysql://localhost:3306/userCenter
-    username: root
-    password: "000000"
-    driver-class-name: com.mysql.cj.jdbc.Driver
     Hikari:
       # 连接池中允许的最小连接数。缺省值：10
       minimum-idle: 10
@@ -47,22 +44,3 @@ mybatis-plus:
       logic-delete-field: deleted
       logic-delete-value: 1
       logic-not-delete-value: 0
-
-knife4j:
-  enable: true
-  openapi:
-    title: 数字灯塔用户中心
-    description: "数字灯塔用户中心接口文档"
-    concat: null&&
-    url: https://docs.xiaominfo.com
-    version: v4.0
-    license: Apache 2.0
-    license-url: https://stackoverflow.com/
-    terms-of-service-url: https://stackoverflow.com/
-    group:
-      test1:
-        group-name: 分组名称
-        api-rule: package
-        api-rule-resources:
-          - com.ycr.usercenter.controller
-
