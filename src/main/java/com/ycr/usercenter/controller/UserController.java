@@ -10,6 +10,7 @@ import com.ycr.usercenter.model.domain.request.UserRegisterRequest;
 import com.ycr.usercenter.service.UserService;
 import com.ycr.usercenter.utils.ReturnResultUtils;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.util.CollectionUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
@@ -29,7 +30,7 @@ import static com.ycr.usercenter.constant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"https://user.null920.top", "http://user.null920.top"}, allowCredentials = "true", methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(origins = {"https://user.null920.top", "http://user.null920.top", "http://localhost:3000", "http://127.0.0.1:3000"}, methods = {RequestMethod.GET, RequestMethod.POST})
 public class UserController {
 	@Resource
 	private UserService userService;
@@ -95,6 +96,15 @@ public class UserController {
 		List<User> userList = userService.list(wrapper);
 		List<User> result = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
 		return ReturnResultUtils.success(result);
+	}
+
+	@GetMapping("/search/tags")
+	public BaseResponse<List<User>> searchUsersByTags(@RequestParam(required = false) List<String> tagNameList) {
+		if (CollectionUtils.isEmpty(tagNameList)) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR, "标签为空");
+		}
+		List<User> userList = userService.searchUsersByTags(tagNameList);
+		return ReturnResultUtils.success(userList);
 	}
 
 	@PostMapping("/delete")
