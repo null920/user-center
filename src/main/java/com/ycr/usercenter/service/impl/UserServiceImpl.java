@@ -150,11 +150,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 			}.getType());
 			tagNameSet = Optional.ofNullable(tagNameSet).orElse(new HashSet<>());
 			for (String tagName : tagNameList) {
-				if (!tagNameSet.contains(tagName)) {
-					return false;
+				if (tagNameSet.contains(tagName)) {
+					return true;
 				}
 			}
-			return true;
+			return false;
 		}).map(this::getSafetyUser).collect(Collectors.toList());
 	}
 

@@ -24,20 +24,28 @@ spring:
       max-lifetime: 1800000
       # 等待连接池分配连接的最大时长（毫秒），超过这个时长还没可用的连接则发生SQLException， 缺省:30秒
       connection-timeout: 30000
-  session:
-    # session过期时间为1天
-    timeout: 86400
   mvc:
     pathmatch:
       # 修改SpringMVC默认路径匹配策略
       matching-strategy: ANT_PATH_MATCHER
+  # redis 配置
+  session:
+    store-type: redis
+
+  redis:
+    port: 6379
+    host: localhost
+    database: 0
+
 
 server:
   port: 8080
   servlet:
     context-path: /api
     session:
-      timeout: 1440m
+      timeout: 30m
+      cookie:
+        domain:
 
 mybatis-plus:
   configuration:
