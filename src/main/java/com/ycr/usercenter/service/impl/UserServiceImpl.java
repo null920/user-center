@@ -214,7 +214,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 	}
 
 
-
 	/**
 	 * 判断是否为管理员
 	 *

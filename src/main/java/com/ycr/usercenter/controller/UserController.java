@@ -30,7 +30,8 @@ import static com.ycr.usercenter.constant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"https://user.null920.top", "http://user.null920.top", "http://localhost:3000", "http://127.0.0.1:3000"},
+@CrossOrigin(origins = {"https://user.null920.top", "http://user.null920.top", "http://localhost:3000", "http://127.0.0.1:3000",
+		"http://localhost:8000", "http://127.0.0.1:8000"},
 		allowCredentials = "true")
 public class UserController {
 	@Resource
@@ -106,6 +107,14 @@ public class UserController {
 		}
 		List<User> userList = userService.searchUsersByTags(tagNameList);
 		return ReturnResultUtils.success(userList);
+	}
+
+	@GetMapping("/recommend")
+	public BaseResponse<List<User>> recommendUsers(HttpServletRequest request) {
+		QueryWrapper<User> wrapper = new QueryWrapper<>();
+		List<User> userList = userService.list(wrapper);
+		List<User> resultList = userList.stream().map(user -> userService.getSafetyUser(user)).collect(Collectors.toList());
+		return ReturnResultUtils.success(resultList);
 	}
 
 	@PostMapping("/update")
