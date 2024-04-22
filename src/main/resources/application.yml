@@ -28,10 +28,9 @@ spring:
     pathmatch:
       # 修改SpringMVC默认路径匹配策略
       matching-strategy: ANT_PATH_MATCHER
-  # redis 配置
   session:
     store-type: redis
-
+  # redis 配置
   redis:
     port: 6379
     host: localhost
@@ -45,7 +44,7 @@ server:
     session:
       timeout: 30m
       cookie:
-        domain:
+        domain: localhost
 
 mybatis-plus:
   configuration:

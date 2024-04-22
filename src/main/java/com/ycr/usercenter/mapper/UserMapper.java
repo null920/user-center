@@ -3,6 +3,8 @@ package com.ycr.usercenter.mapper;
 import com.ycr.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.core.mapper.BaseMapper;
 import org.apache.ibatis.annotations.Mapper;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.mapping.FetchType;
 
 /**
  * @author null&&

@@ -2,6 +2,8 @@ package com.ycr.usercenter.service;
 
 import com.ycr.usercenter.model.domain.User;
 import com.baomidou.mybatisplus.extension.service.IService;
+import org.apache.ibatis.annotations.Options;
+import org.apache.ibatis.mapping.FetchType;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -64,4 +66,37 @@ public interface UserService extends IService<User> {
 	 * @return 用户list
 	 */
 	List<User> searchUsersByTagsBySQL(List<String> tagNameList);
+
+	/**
+	 * 更新用户信息
+	 *
+	 * @param user      传入的用户信息
+	 * @param loginUser 当前登录的用户
+	 * @return 受影响的行数
+	 */
+	Integer updateUser(User user, User loginUser);
+
+	/**
+	 * 获取当前登录用户
+	 *
+	 * @param request http请求
+	 * @return 当前登录用户
+	 */
+	User getLoginUser(HttpServletRequest request);
+
+	/**
+	 * 是否为管理员
+	 *
+	 * @param loginUser 当前登录用户
+	 * @return 是否为管理员
+	 */
+	boolean isAdmin(User loginUser);
+
+	/**
+	 * 根据id查询用户
+	 *
+	 * @param id 用户id
+	 * @return 用户
+	 */
+	User selectUserById(Long id);
 }

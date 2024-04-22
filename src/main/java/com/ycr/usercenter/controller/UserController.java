@@ -30,7 +30,8 @@ import static com.ycr.usercenter.constant.UserConstant.USER_LOGIN_STATE;
  */
 @RestController
 @RequestMapping("/user")
-@CrossOrigin(origins = {"https://user.null920.top", "http://user.null920.top", "http://localhost:3000", "http://127.0.0.1:3000"}, methods = {RequestMethod.GET, RequestMethod.POST})
+@CrossOrigin(origins = {"https://user.null920.top", "http://user.null920.top", "http://localhost:3000", "http://127.0.0.1:3000"},
+		allowCredentials = "true")
 public class UserController {
 	@Resource
 	private UserService userService;
@@ -76,11 +77,11 @@ public class UserController {
 	@GetMapping("/current")
 	public BaseResponse<User> getCurrentUser(HttpServletRequest request) {
 		// 这样做的话如果用户的信息有更新，同时也要更新session
-		User result = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
-		if (result == null) {
+		User currentUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+		if (currentUser == null) {
 			throw new BusinessException(ErrorCode.NOT_LOGIN, "请先登录");
 		}
-		return ReturnResultUtils.success(result);
+		return ReturnResultUtils.success(currentUser);
 	}
 
 	@GetMapping("/search")
@@ -107,6 +108,23 @@ public class UserController {
 		return ReturnResultUtils.success(userList);
 	}
 
+	@PostMapping("/update")
+	public BaseResponse<Integer> updateUser(@RequestBody User user, HttpServletRequest request) {
+		// 校验参数是否为空
+		if (user == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR, "参数为空");
+		}
+		User loginUser = userService.getLoginUser(request);
+		Integer result = userService.updateUser(user, loginUser);
+		if (result != null) {
+			// 更新Session
+			User safetyUser = userService.getSafetyUser(userService.selectUserById(user.getId()));
+			request.getSession().setAttribute(USER_LOGIN_STATE, safetyUser);
+			return ReturnResultUtils.success(result);
+		}
+		return ReturnResultUtils.error(ErrorCode.PARAMS_ERROR, "更新失败");
+	}
+
 	@PostMapping("/delete")
 	public BaseResponse<Boolean> deleteUser(@RequestBody long id, HttpServletRequest request) {
 		// 鉴权，仅管理员可查询
@@ -129,7 +147,6 @@ public class UserController {
 	 */
 	private boolean isAdmin(HttpServletRequest request) {
 		User userObj = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
-		return userObj != null && userObj.getUserRole() == ADMIN_ROLE;
+		return userObj != null && userObj.getUserRole().equals(ADMIN_ROLE);
 	}
-
 }

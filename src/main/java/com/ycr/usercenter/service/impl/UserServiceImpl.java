@@ -24,6 +24,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import static com.ycr.usercenter.constant.UserConstant.ADMIN_ROLE;
 import static com.ycr.usercenter.constant.UserConstant.USER_LOGIN_STATE;
 
 /**
@@ -150,6 +151,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 			}.getType());
 			tagNameSet = Optional.ofNullable(tagNameSet).orElse(new HashSet<>());
 			for (String tagName : tagNameList) {
+				// 只要有一个标签匹配就返回 true
 				if (tagNameSet.contains(tagName)) {
 					return true;
 				}
@@ -157,7 +159,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 			return false;
 		}).map(this::getSafetyUser).collect(Collectors.toList());
 	}
-
 
 	@Deprecated
 	public List<User> searchUsersByTagsBySQL(List<String> tagNameList) {
@@ -172,7 +173,65 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		return userList.stream().map(this::getSafetyUser).collect(Collectors.toList());
 	}
 
+	@Override
+	public Integer updateUser(User user, User loginUser) {
+		// 校验参数
+		if (user.getId() == null || loginUser.getId() == null) {
+			throw new BusinessException(ErrorCode.PARAMS_ERROR);
+		}
+		// 校验权限：仅管理员和自己可修改
+		if (!isAdmin(loginUser) && !loginUser.getId().equals(user.getId())) {
+			throw new BusinessException(ErrorCode.NO_AUTH, "无权限");
+		}
+		// 如果是管理员允许更新所有人的信息
+		if (isAdmin(loginUser)) {
+			return userMapper.updateById(user);
+		}
+		// 如果不是管理员只允许更新自己的信息
+		if (loginUser.getId().equals(user.getId())) {
+			return userMapper.updateById(user);
+		}
+		return null;
+	}
 
+	@Override
+	public User getLoginUser(HttpServletRequest request) {
+		if (request == null) {
+			return null;
+		}
+		User loginUser = (User) request.getSession().getAttribute(USER_LOGIN_STATE);
+		if (loginUser == null) {
+			throw new BusinessException(ErrorCode.NO_AUTH, "未登录");
+		}
+		return loginUser;
+	}
+
+	@Override
+	public User selectUserById(Long id) {
+		QueryWrapper<User> wrapper = new QueryWrapper<>();
+		wrapper.eq("id", id);
+		return userMapper.selectOne(wrapper);
+	}
+
+
+
+	/**
+	 * 判断是否为管理员
+	 *
+	 * @param loginUser 当前登录用户
+	 * @return 是否为管理员
+	 */
+	@Override
+	public boolean isAdmin(User loginUser) {
+		return loginUser != null && loginUser.getUserRole().equals(ADMIN_ROLE);
+	}
+
+	/**
+	 * 用户信息脱敏
+	 *
+	 * @param originUser 原始用户
+	 * @return 脱敏后的用户
+	 */
 	@Override
 	public User getSafetyUser(User originUser) {
 		if (originUser == null) {
@@ -192,7 +251,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User>
 		safetyUser.setTags(originUser.getTags());
 		return safetyUser;
 	}
-
 
 }
 
