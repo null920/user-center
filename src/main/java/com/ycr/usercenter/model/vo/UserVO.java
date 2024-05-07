@@ -1,25 +1,24 @@
-package com.ycr.usercenter.model.domain;
+package com.ycr.usercenter.model.vo;
 
-import com.baomidou.mybatisplus.annotation.*;
+import lombok.Data;
 
 import java.io.Serializable;
 import java.util.Date;
 
-import lombok.Data;
-
 /**
- * 用户
+ * 用户视图对象（脱敏）
  *
  * @author null&&
- * @TableName user
+ * @version 1.0
+ * @date 2024/4/28 17:45
  */
-@TableName(value = "user")
 @Data
-public class User implements Serializable {
+public class UserVO implements Serializable {
+	private static final long serialVersionUID = -5916124655317919353L;
+
 	/**
 	 * id
 	 */
-	@TableId(type = IdType.AUTO)
 	private Long id;
 
 	/**
@@ -41,11 +40,6 @@ public class User implements Serializable {
 	 * 性别
 	 */
 	private Integer gender;
-
-	/**
-	 * 密码
-	 */
-	private String userPassword;
 
 	/**
 	 * 电话
@@ -73,12 +67,6 @@ public class User implements Serializable {
 	private Date updateTime;
 
 	/**
-	 * 是否删除 0 1（逻辑删除）
-	 */
-	@TableLogic
-	private Integer deleted;
-
-	/**
 	 * 用户角色 0-普通用户 1-管理员
 	 */
 	private Integer userRole;
@@ -88,6 +76,4 @@ public class User implements Serializable {
 	 */
 	private String tags;
 
-	@TableField(exist = false)
-	private static final long serialVersionUID = 2728434441333864902L;
 }

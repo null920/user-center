@@ -1,6 +1,7 @@
 package com.ycr.usercenter.exception;
 
 import com.ycr.usercenter.common.ErrorCode;
+import lombok.Getter;
 
 /**
  * 自定义业务异常类
@@ -9,6 +10,7 @@ import com.ycr.usercenter.common.ErrorCode;
  * @version 1.0
  * @date 2024/4/13 21:03
  */
+@Getter
 public class BusinessException extends RuntimeException {
 	private final int code;
 	private final String desc;
@@ -31,11 +33,4 @@ public class BusinessException extends RuntimeException {
 		this.desc = desc;
 	}
 
-	public int getCode() {
-		return code;
-	}
-
-	public String getDesc() {
-		return desc;
-	}
 }
